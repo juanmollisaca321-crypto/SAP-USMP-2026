@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Portal del Alumno | USMP</title>
+
+  <!-- Tipografía (opcional). Si no hay internet, el navegador usará las fuentes de sistema. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      /* Identidad USMP (rojo institucional + neutros) */
+      --usmp-red:#B5121B;
+      --usmp-red-2:#8F0F16;
+      --ink:#0B1220;
+      --muted:#667085;
+      --border:#E4E7EC;
+      --bg:#F5F6F8;
+      --surface:#FFFFFF;
+      --surface-2:#FCFCFD;
+
+      --radius:18px;
+      --radius-sm:14px;
+
+      --shadow-1: 0 10px 22px rgba(16,24,40,.08);
+      --shadow-2: 0 22px 52px rgba(16,24,40,.16);
+      --shadow-3: 0 34px 80px rgba(16,24,40,.18);
+
+      --container: 1120px;
+      --gap: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background:
+        radial-gradient(1100px 520px at 14% -8%, rgba(181,18,27,.16), transparent 60%),
+        radial-gradient(900px 520px at 92% -10%, rgba(143,15,22,.14), transparent 58%),
+        linear-gradient(180deg, #FFFFFF 0%, var(--bg) 52%, #EEF1F5 100%);
+    }
+
+    /* Accesibilidad */
+    :focus-visible{
+      outline: 3px solid rgba(181,18,27,.38);
+      outline-offset: 3px;
+      border-radius: 12px;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+    }
+
+    /* Header */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(228,231,236,.85);
+    }
+
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(181,18,27,.20), rgba(181,18,27,0) 55%),
+        radial-gradient(700px 120px at 20% 0%, rgba(181,18,27,.10), transparent 60%);
+      opacity:.55;
+    }
+
+    .topbar__inner{
+      position:relative;
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand__logo{
+      height: 34px;
+      width: auto;
+      display:block;
+      filter: drop-shadow(0 10px 16px rgba(16,24,40,.08));
+    }
+
+    .brand__text{
+      display:flex;
+      flex-direction:column;
+      line-height:1.12;
+      min-width: 0;
+    }
+
+    .brand__title{
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand__subtitle{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(228,231,236,.95);
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration:none;
+      box-shadow: 0 6px 14px rgba(16,24,40,.08);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .chip:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(16,24,40,.12);
+      border-color: rgba(181,18,27,.22);
+    }
+
+    .avatar{
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+      letter-spacing:.3px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--usmp-red), var(--usmp-red-2));
+      box-shadow: 0 14px 24px rgba(181,18,27,.26);
+      border: 1px solid rgba(255,255,255,.28);
+    }
+
+    /* Layout */
+    main{
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 22px 18px 30px;
+    }
+
+    .hero{
+      border-radius: calc(var(--radius) + 6px);
+      padding: 22px;
+      background:
+        radial-gradient(900px 320px at 0% 0%, rgba(255,255,255,.22), transparent 62%),
+        radial-gradient(800px 340px at 95% 20%, rgba(255,255,255,.12), transparent 62%),
+        linear-gradient(135deg, var(--usmp-red), var(--usmp-red-2));
+      color: #fff;
+      box-shadow: var(--shadow-3);
+      position:relative;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:-80px -110px auto auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      filter: blur(.2px);
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:auto -160px -160px auto;
+      width: 340px;
+      height: 340px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      transform: rotate(12deg);
+    }
+
+    .hero__row{
+      position:relative;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .hero__title{
+      margin:0;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+
+    .hero__desc{
+      margin: 8px 0 0;
+      font-size: 13px;
+      opacity:.93;
+      max-width: 62ch;
+      line-height: 1.45;
+    }
+
+    .hero__meta{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.24);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .section{
+      margin-top: 18px;
+    }
+
+    .section__head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      margin: 12px 0 12px;
+      flex-wrap: wrap;
+    }
+
+    .section__title{
+      margin:0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+
+    .section__hint{
+      margin:0;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--gap);
+    }
+
+    .card{
+      grid-column: span 3;
+      background: linear-gradient(180deg, var(--surface), var(--surface-2));
+      border: 1px solid rgba(228,231,236,.95);
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow-1);
+      padding: 16px 16px 14px;
+      text-decoration:none;
+      color: inherit;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      min-height: 132px;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      height: 4px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--usmp-red), rgba(181,18,27,.35));
+    }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:auto -60px -60px auto;
+      width: 160px;
+      height: 160px;
+      border-radius: 999px;
+      background: rgba(181,18,27,.06);
+      pointer-events:none;
+    }
+
+    .card:hover{
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-2);
+      border-color: rgba(181,18,27,.22);
+    }
+
+    .card__top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .icon{
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: rgba(181,18,27,.10);
+      border: 1px solid rgba(181,18,27,.18);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+      box-shadow: 0 10px 18px rgba(181,18,27,.10);
+    }
+
+    .icon svg{
+      width: 18px;
+      height: 18px;
+      fill: var(--usmp-red);
+    }
+
+    .card__title{
+      margin:0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .1px;
+    }
+
+    .card__desc{
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .card__cta{
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--usmp-red);
+    }
+
+    .arrow{
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      border: 1px solid rgba(181,18,27,.25);
+      background: rgba(181,18,27,.06);
+    }
+
+    .arrow svg{
+      width: 14px;
+      height: 14px;
+      fill: var(--usmp-red);
+    }
+
+    /* Responsive */
+    @media (max-width: 1060px){
+      .card{ grid-column: span 4; }
+    }
+    @media (max-width: 740px){
+      .topbar__inner{ padding: 12px 14px; }
+      main{ padding: 18px 14px 26px; }
+      .hero{ padding: 18px; }
+      .card{ grid-column: span 6; }
+      .brand__subtitle{ display:none; }
+    }
+    @media (max-width: 480px){
+      .card{ grid-column: span 12; }
+      .hero__meta{ justify-content:flex-start; }
+    }
+
+    /* Footer */
+    footer{
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 18px 22px;
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tiny-link{
+      color: var(--muted);
+      text-decoration:none;
+      border-bottom: 1px dashed rgba(102,112,133,.55);
+    }
+    .tiny-link:hover{ color: var(--ink); border-bottom-color: rgba(11,18,32,.35); }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand" aria-label="USMP - Portal del Alumno">
+        <!-- Logo USMP (puedes reemplazarlo por el asset oficial interno de tu institución si lo tienes) -->
+        <img class="brand__logo" src="https://upload.wikimedia.org/wikipedia/commons/a/af/LOGO_USMP.png" alt="USMP" />
+        <div class="brand__text">
+          <div class="brand__title">Portal del Alumno</div>
+          <div class="brand__subtitle">Universidad de San Martín de Porres</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="chip" href="#" aria-label="Ir a ayuda">
+          <!-- ícono help -->
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16a8 8 0 0 1 0 16Zm0-5a1.25 1.25 0 1 0 0 2.5A1.25 1.25 0 0 0 12 15Zm0-10a4 4 0 0 0-4 4h2a2 2 0 1 1 3.2 1.6c-.83.62-1.2 1.13-1.2 2.4V14h2v-.5c0-.9.16-1.19.8-1.67A4 4 0 0 0 12 5Z"/>
+          </svg>
+          Ayuda
+        </a>
+        <div class="avatar" aria-label="Perfil">JS</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Bienvenida">
+      <div class="hero__row">
+        <div>
+          <h1 class="hero__title">Bienvenido(a) al Portal del Alumno</h1>
+          <p class="hero__desc">Accede rápidamente a tus documentos, notas y estado financiero. Diseño institucional USMP: limpio, moderno y listo.</p>
+        </div>
+
+        <div class="hero__meta" aria-label="Información rápida">
+          <div class="pill">
+            <!-- ícono calendario -->
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M7 2h2v2h6V2h2v2h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3V2Zm15 8H2v10h20V10ZM4 8h16V6H4v2Z"/>
+            </svg>
+            Periodo: 2026-I
+          </div>
+          <div class="pill">
+            <!-- ícono escudo -->
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M12 2 4 5v6c0 5 3.4 9.4 8 11c4.6-1.6 8-6 8-11V5l-8-3Zm0 18.9C8.5 19.4 6 15.8 6 11V6.3L12 4l6 2.3V11c0 4.8-2.5 8.4-6 9.9Z"/>
+            </svg>
+            Estado: Activo
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Menú Principal">
+      <div class="section__head">
+        <div>
+          <h2 class="section__title">Menú principal</h2>
+          <p class="section__hint">Selecciona una opción para continuar.</p>
+        </div>
+
+        <p class="section__hint">Sugerencia: usa <strong>Tab</strong> para navegar con teclado.</p>
+      </div>
+
+      <div class="grid dashboard" role="list">
+        <!-- Card 1 -->
+        <a class="card" href="#" role="listitem" aria-label="Constancia de Matrícula">
+          <div class="card__top">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm0 2v16h10V4H7Zm2 3h6v2H9V7Zm0 4h6v2H9v-2Zm0 4h4v2H9v-2Z"/></svg>
+            </div>
+          </div>
+          <div>
+            <h3 class="card__title">Constancia de Matrícula</h3>
+            <p class="card__desc">Genera y descarga tu documento oficial de matrícula.</p>
+          </div>
+          <div class="card__cta">
+            <span>Ver documento</span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6L13 5Z"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a class="card" href="ultimo_corregido_v2.html" role="listitem" aria-label="Mis Resultados">
+          <div class="card__top">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 19V5h2v14H4Zm4 0V9h2v10H8Zm4 0V12h2v7h-2Zm4 0V7h2v12h-2Zm4 0V4h2v15h-2Z"/></svg>
+            </div>
+          </div>
+          <div>
+            <h3 class="card__title">Mis Resultados</h3>
+            <p class="card__desc">Consulta notas, promedios y estado por asignatura.</p>
+          </div>
+          <div class="card__cta">
+            <span>Ir a notas</span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6L13 5Z"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a class="card" href="#" role="listitem" aria-label="Pagos">
+          <div class="card__top">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Zm2 0v2h14V6H5Zm0 4v8h14v-8H5Zm2 2h6v2H7v-2Zm0 3h4v2H7v-2Z"/></svg>
+            </div>
+          </div>
+          <div>
+            <h3 class="card__title">Pagos</h3>
+            <p class="card__desc">Revisa tu estado financiero, boletas y vencimientos.</p>
+          </div>
+          <div class="card__cta">
+            <span>Ver estado</span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6L13 5Z"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <!-- Card 4 -->
+        <a class="card" href="portal_historial_plan_estudios_usmp_sin_panel_lateral.html" role="listitem" aria-label="Historial Académico">
+          <div class="card__top">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 2l9 5-9 5-9-5 9-5Zm0 8 7.5-4.2L12 2.8 4.5 5.8 12 10Zm-8 2.2 8 4.4 8-4.4V14l-8 4.4L4 14v-1.8Zm0 5 8 4.4 8-4.4V19l-8 4.4L4 19v-1.8Z"/></svg>
+            </div>
+          </div>
+          <div>
+            <h3 class="card__title">Historial Académico</h3>
+            <p class="card__desc">Consulta tu historial por plan curricular y periodos.</p>
+          </div>
+          <div class="card__cta">
+            <span>Ver historial</span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6L13 5Z"/></svg>
+            </span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2025 USMP · Portal del Alumno</span>
+    <span>Powered by <a class="tiny-link" href="#" aria-label="SAP">SAP</a></span>
+  </footer>
+</body>
+</html>
